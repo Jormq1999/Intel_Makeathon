@@ -1,0 +1,8 @@
+mammoth
+html2text
+Note: to use `pandoc_convert.py` with the Python wrapper install `pypandoc` and ensure `pandoc` is installed on your system:
+
+```powershell
+pip install pypandoc
+# and install pandoc from https://pandoc.org/installing.html or use your package manager
+```
