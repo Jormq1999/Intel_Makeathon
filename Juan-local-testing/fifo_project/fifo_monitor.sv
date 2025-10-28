@@ -1,9 +1,10 @@
-```systemverilog
 //
 // UVM Monitor: fifo_monitor
 //
 `ifndef FIFO_MONITOR_SV
 `define FIFO_MONITOR_SV
+
+`include "uvm_macros.svh"
 
 class fifo_monitor extends uvm_monitor;
     `uvm_component_utils(fifo_monitor)
@@ -22,25 +23,29 @@ class fifo_monitor extends uvm_monitor;
             `uvm_fatal("NOVIF", "Could not get virtual interface")
     endfunction
 
-    virtual task run_phase(uvm_phase phase);
-        forever begin
-            @(posedge vif.clk);
-            if (vif.w_en && !vif.full) begin
-                fifo_item item = fifo_item::type_id::create("item");
-                item.trans_type = fifo_item::WRITE;
-                item.data = vif.w_data;
-                item_collected_port.write(item);
-            end
-            if (vif.r_en && !vif.empty) begin
-                fifo_item item = fifo_item::type_id::create("item");
-                item.trans_type = fifo_item::READ;
-                item.data = vif.r_data;
-                item_collected_port.write(item);
-            end
-        end
-    endtask
+  virtual task run_phase(uvm_phase phase);
+      fifo_item item;
 
+      forever begin
+          @(posedge vif.clk);
+
+          // Monitor write transactions
+          if (vif.w_en && !vif.full) begin
+              item = fifo_item::type_id::create("write_item");
+              item.trans_type = fifo_item::WRITE;
+              item.data = vif.w_data;
+              item_collected_port.write(item);
+          end
+
+          // Monitor read transactions
+          if (vif.r_en && !vif.empty) begin
+              item = fifo_item::type_id::create("read_item");
+              item.trans_type = fifo_item::READ;
+              item.data = vif.r_data;
+              item_collected_port.write(item);
+          end
+      end
+  endtask
 endclass
 
 `endif // FIFO_MONITOR_SV
-```

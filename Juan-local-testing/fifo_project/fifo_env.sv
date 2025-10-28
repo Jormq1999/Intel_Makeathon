@@ -1,4 +1,3 @@
-```systemverilog
 //
 // UVM Environment: fifo_env
 //
@@ -28,4 +27,3 @@ class fifo_env extends uvm_env;
 endclass
 
 `endif // FIFO_ENV_SV
-```

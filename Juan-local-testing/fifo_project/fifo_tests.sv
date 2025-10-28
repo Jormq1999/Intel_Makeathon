@@ -1,4 +1,3 @@
-```systemverilog
 //
 // UVM Base Test: fifo_base_test
 //
@@ -39,8 +38,9 @@ class test_write_to_full extends fifo_base_test;
     endfunction
 
     virtual task run_phase(uvm_phase phase);
-        fifo_write_sequence seq = fifo_write_sequence::type_id::create("seq");
+        fifo_write_sequence seq;
         phase.raise_objection(this);
+        seq = fifo_write_sequence::type_id::create("seq");
         seq.num_writes = 20; // More than DEPTH to test full condition
         seq.start(env.agent.sequencer);
         #100ns;
@@ -59,14 +59,16 @@ class test_read_from_empty extends fifo_base_test;
     endfunction
 
     virtual task run_phase(uvm_phase phase);
+        fifo_read_sequence read_seq;
+        fifo_write_sequence write_seq;
         phase.raise_objection(this);
         // First, fill the FIFO
-        fifo_write_sequence write_seq = fifo_write_sequence::type_id::create("write_seq");
+        write_seq = fifo_write_sequence::type_id::create("write_seq");
         write_seq.num_writes = 16;
         write_seq.start(env.agent.sequencer);
         
         // Then, read until empty
-        fifo_read_sequence read_seq = fifo_read_sequence::type_id::create("read_seq");
+        read_seq = fifo_read_sequence::type_id::create("read_seq");
         read_seq.num_reads = 20; // More than DEPTH
         read_seq.start(env.agent.sequencer);
         #100ns;
@@ -75,4 +77,3 @@ class test_read_from_empty extends fifo_base_test;
 endclass
 
 `endif // FIFO_BASE_TEST_SV
-```

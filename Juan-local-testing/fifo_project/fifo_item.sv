@@ -1,4 +1,3 @@
-```systemverilog
 //
 // UVM Transaction Item: fifo_item
 //
@@ -27,4 +26,3 @@ class fifo_item extends uvm_sequence_item;
 endclass
 
 `endif // FIFO_ITEM_SV
-```

@@ -1,4 +1,3 @@
-```systemverilog
 //
 // UVM Sequence: fifo_base_sequence
 //
@@ -61,4 +60,3 @@ class fifo_read_sequence extends fifo_base_sequence;
 endclass
 
 `endif // FIFO_BASE_SEQUENCE_SV
-```

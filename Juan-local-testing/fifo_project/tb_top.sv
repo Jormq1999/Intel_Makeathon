@@ -1,4 +1,3 @@
-```systemverilog
 //
 // Top-level Testbench: tb_top
 //
@@ -50,11 +49,10 @@ module tb_top;
     // UVM Test Execution
     initial begin
         // Place the interface into the UVM configuration database
-        uvm_config_db#(virtual fifo_if)::set(null, "uvm_test_top", "vif", dut_if);
+        uvm_config_db#(virtual fifo_if)::set(null, "uvm_test_top.*", "vif", dut_if);
         
         // Run the UVM test
-        run_test("fifo_base_test");
+        run_test();
     end
 
 endmodule
-```

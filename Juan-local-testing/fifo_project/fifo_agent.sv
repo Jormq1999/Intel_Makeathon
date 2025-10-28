@@ -1,4 +1,3 @@
-```systemverilog
 //
 // UVM Agent: fifo_agent
 //
@@ -34,4 +33,3 @@ class fifo_agent extends uvm_agent;
 endclass
 
 `endif // FIFO_AGENT_SV
-```

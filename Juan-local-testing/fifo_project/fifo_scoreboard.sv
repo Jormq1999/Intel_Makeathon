@@ -1,9 +1,10 @@
-```systemverilog
 //
 // UVM Scoreboard: fifo_scoreboard
 //
 `ifndef FIFO_SCOREBOARD_SV
 `define FIFO_SCOREBOARD_SV
+
+`include "uvm_macros.svh"
 
 class fifo_scoreboard extends uvm_scoreboard;
     `uvm_component_utils(fifo_scoreboard)
@@ -17,24 +18,18 @@ class fifo_scoreboard extends uvm_scoreboard;
     endfunction
 
     virtual function void write(fifo_item item);
+        fifo_item expected_item;
+
         if (item.trans_type == fifo_item::WRITE) begin
             expected_q.push_back(item);
-            `uvm_info("SCOREBOARD", $sformatf("Write transaction collected. Data: %h", item.data), UVM_HIGH)
         end else if (item.trans_type == fifo_item::READ) begin
             if (expected_q.size() > 0) begin
-                fifo_item expected_item = expected_q.pop_front();
+                expected_item = expected_q.pop_front();
                 if (expected_item.data != item.data) begin
                     `uvm_error("SCOREBOARD", $sformatf("Data mismatch! Expected: %h, Actual: %h", expected_item.data, item.data))
-                end else begin
-                    `uvm_info("SCOREBOARD", $sformatf("Data match. Data: %h", item.data), UVM_HIGH)
                 end
-            end else begin
-                `uvm_warning("SCOREBOARD", "Read from empty FIFO detected by monitor.")
             end
         end
     endfunction
-
 endclass
-
 `endif // FIFO_SCOREBOARD_SV
-```

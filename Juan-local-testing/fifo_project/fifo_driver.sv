@@ -1,4 +1,3 @@
-```systemverilog
 //
 // UVM Driver: fifo_driver
 //
@@ -46,4 +45,3 @@ class fifo_driver extends uvm_driver #(fifo_item);
 endclass
 
 `endif // FIFO_DRIVER_SV
-```

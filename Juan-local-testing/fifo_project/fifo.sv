@@ -1,4 +1,3 @@
-```systemverilog
 //
 // Design: AXI-Style Synchronous FIFO
 //
@@ -39,6 +38,7 @@ module fifo #(
 
     // Internal storage
     logic [DATA_WIDTH-1:0] mem [DEPTH-1:0];
+    logic [DATA_WIDTH-1:0] r_data_reg;
 
     // Pointers and counters
     logic [ADDR_WIDTH-1:0] w_ptr;
@@ -54,6 +54,14 @@ module fifo #(
             r_ptr <= '0;
             item_count <= '0;
         end else begin
+            // Item counter logic
+            case ({w_en && !full, r_en && !empty})
+                2'b10: item_count <= item_count + 1; // Write, no read
+                2'b01: item_count <= item_count - 1; // Read, no write
+                // 2'b11 (Write and Read) and 2'b00 (No op): count remains the same
+                default: item_count <= item_count;
+            endcase
+
             // Write pointer logic
             if (w_en && !full) begin
                 w_ptr <= w_ptr + 1;
@@ -63,14 +71,6 @@ module fifo #(
             if (r_en && !empty) begin
                 r_ptr <= r_ptr + 1;
             end
-
-            // Item counter logic
-            case ({w_en && !full, r_en && !empty})
-                2'b10: item_count <= item_count + 1; // Write, no read
-                2'b01: item_count <= item_count - 1; // Read, no write
-                // 2'b11 (Write and Read) and 2'b00 (No op): count remains the same
-                default: item_count <= item_count;
-            endcase
         end
     end
 
@@ -83,7 +83,14 @@ module fifo #(
         end
     end
 
-    assign r_data = mem[r_ptr];
+    // Registered read data output
+    always_ff @(posedge clk) begin
+        if (r_en && !empty) begin
+            r_data_reg <= mem[r_ptr];
+        end
+    end
+
+    assign r_data = r_data_reg;
 
     //--------------------------------------------------------------------------
     // Status Flags
@@ -95,4 +102,3 @@ module fifo #(
     assign almost_empty = (item_count <= AEMPTY_THRESH);
 
 endmodule
-```

@@ -1,4 +1,3 @@
-```systemverilog
 //
 // Interface: fifo_if
 //
@@ -57,4 +56,3 @@ interface fifo_if (
     );
 
 endinterface
-```
