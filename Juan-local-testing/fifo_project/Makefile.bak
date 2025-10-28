@@ -1,0 +1,47 @@
+## Makefile for running tests for the FIFO project
+## Usage:
+##   make compile          # Compiles the SystemVerilog code (VCS)
+##   make run TEST=<name>  # Runs the compiled simv with the given UVM test
+##   make iver_wrap        # Quick Icarus directed test (iverilog + vvp)
+
+# Tool Configuration (using Synopsys VCS as an example)
+VCS = vcs
+VCS_FLAGS = -full64 -sverilog +v2k -timescale=1ns/1ps -debug_access+all
+UVM_HOME ?= /path/to/your/uvm/library
+
+# Files
+DUT = fifo.sv
+TB_TOP = tb_top.sv
+INTERFACE = fifo_if.sv
+UVM_COMPONENTS = fifo_item.sv fifo_sequences.sv fifo_driver.sv fifo_monitor.sv fifo_scoreboard.sv fifo_agent.sv fifo_env.sv fifo_tests.sv
+TEST_NAME ?= fifo_base_test
+
+# Icarus (non-UVM) tool names
+IVERILOG = iverilog
+VVP = vvp
+
+all: compile
+
+## VCS (UVM) targets
+compile:
+	$(VCS) $(VCS_FLAGS) +incdir+$(UVM_HOME)/src $(UVM_HOME)/src/uvm_pkg.sv \
+		$(DUT) $(INTERFACE) $(TB_TOP) $(UVM_COMPONENTS) -o simv
+
+run:
+	./simv +UVM_TESTNAME=$(TEST_NAME)
+
+## Icarus Verilog targets for quick directed tests
+iver_wrap:
+	$(IVERILOG) -g2012 -o tb_wrap.vvp $(DUT) $(INTERFACE) tb_wrap.sv
+	$(VVP) tb_wrap.vvp
+
+iver_simul:
+	$(IVERILOG) -g2012 -o tb_simul.vvp $(DUT) $(INTERFACE) tb_simul.sv
+	$(VVP) tb_simul.vvp
+
+iver_edge:
+	$(IVERILOG) -g2012 -o tb_edgecases.vvp $(DUT) $(INTERFACE) tb_edgecases.sv
+	$(VVP) tb_edgecases.vvp
+
+clean:
+	rm -rf simv simv.daidir csrc *.log *.key DVEfiles/ *.vvp

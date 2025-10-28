@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1761681801.254498054, "rt":5.76, "ut":5.08, "st":0.08}}
+{"vcselab":{"timestamp_begin":1761681807.050247227, "rt":0.50, "ut":0.11, "st":0.04}}
+{"link":{"timestamp_begin":1761681807.607217028, "rt":1.87, "ut":0.43, "st":0.16}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1761681801.040079451}
+{"VCS_COMP_START_TIME": 1761681801.040079451}
+{"VCS_COMP_END_TIME": 1761681809.677673842}
+{"VCS_USER_OPTIONS": "-full64 -sverilog +v2k -timescale=1ns/1ps -debug_access+all -ntb_opts uvm +incdir+/p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm-1.2/src /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm-1.2/src/uvm_pkg.sv fifo.sv tb_top.sv fifo_if.sv fifo_item.sv fifo_sequences.sv fifo_driver.sv fifo_monitor.sv fifo_scoreboard.sv fifo_agent.sv fifo_env.sv fifo_tests.sv -o simv"}
+{"vcs1": {"peak_mem": 378340}}
+{"vcselab": {"peak_mem": 188460}}
