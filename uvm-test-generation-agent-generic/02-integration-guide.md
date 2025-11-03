@@ -10,7 +10,8 @@ This guide describes how to integrate extracted sequences, signals, and test str
 
 ```mermaid
 graph TD
-    A[Extracted Components] --> B[Signal Mapping]
+    A[Extracted Components] --> AA[Reference Search]
+    AA --> B[Component Mapping & Reuse]
     B --> C[Sequence Integration]
     C --> D[Test Assembly]
     D --> E[Validation & Verification]
@@ -29,8 +30,16 @@ class TestIntegration:
         self.sequences = sequences
         self.signals = signals
         self.architecture = architecture
+        self.reference_components = self.find_reference_components()
         self.integration_map = self.create_integration_map()
     
+    def find_reference_components(self):
+        """Search for existing verification files for reuse."""
+        search_keywords = [self.architecture.get('protocol'), *self.architecture.get('components', [])]
+        # Pseudocode for searching files. This would be implemented with file system tools.
+        # find_files(keywords=search_keywords, extensions=['.sv', '.svh', '*_pkg.sv'])
+        return "found_components"
+
     def create_integration_map(self):
         return {
             'interface_bindings': self.map_signals_to_interfaces(),
@@ -38,6 +47,39 @@ class TestIntegration:
             'timing_relationships': self.establish_timing_constraints(),
             'data_flow': self.map_data_dependencies()
         }
+```
+
+### 1.3 Reference Component Search
+
+Before generating new components from scratch, the agent must search the existing workspace for verification assets that can be reused or adapted. This step promotes code reuse and accelerates the verification process.
+
+**Search Strategy**:
+1.  **Identify Keywords**: Use keywords from the extracted components, such as protocol names (`AXI`, `PCIe`, `FIFO`), component types (`driver`, `monitor`, `agent`), and interface names.
+2.  **Filter by File Type**: Limit the search to verification-specific file extensions, such as `.sv`, `.svh`, `*_pkg.sv`, `*_test.sv`, and `Makefile` or script files related to simulation. Avoid searching within RTL directories (`rtl/`, `src/`).
+3.  **Analyze Findings**: If relevant files are found, the agent should analyze them to determine if they can be integrated directly or used as a template.
+
+```python
+def find_reusable_verification_files(keywords):
+    """
+    Searches the workspace for verification files matching a set of keywords.
+    The search is focused on non-RTL directories.
+    """
+    reusable_assets = {}
+    # Example: Search for files like 'axi_driver.sv', 'pcie_agent_pkg.sv', etc.
+    # This would be a call to a file search tool.
+    search_results = workspace.find_files(
+        query=f"**/*{keywords}*.sv*", 
+        exclude="**/rtl/**"
+    )
+    
+    for file_path in search_results:
+        component_type = detect_component_type(file_path) # e.g., 'driver', 'agent'
+        if component_type:
+            if component_type not in reusable_assets:
+                reusable_assets[component_type] = []
+            reusable_assets[component_type].append(file_path)
+            
+    return reusable_assets
 ```
 
 ## 2. Signal-to-Interface Mapping
@@ -487,7 +529,7 @@ endclass
 3. **Error Handling**: Implement robust error checking
 4. **Documentation**: Maintain integration documentation
 5. **Validation**: Thoroughly test integrated components
-6. **Reusability**: Design for component reuse
+6. **Reusability**: Prioritize searching and reusing existing verification components before generating new ones.
 
 ---
 
