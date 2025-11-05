@@ -149,30 +149,30 @@ This section is critical for understanding the testbench structure.
 - **Description**: The top-level environment that integrates all other components.
 
 ### BFMs
-- **`pchnl_bfm`**: Handles P-channel protocol interactions.
-- **`iosf_bfm`**: Manages IOSF primary and sideband traffic.
+- **`protocol_a_bfm`**: Handles Protocol A interactions.
+- **`protocol_b_bfm`**: Manages Protocol B primary and sideband traffic.
 
 ### Scoreboards
 
-#### P-channel Scoreboard
-- **Description**: Responsible for checking P-channel signal correctness (pactive, paccept, pdeny) based on engine idleness.
-- **Checking Logic**: Predicts expected `PACTIVE_FUNC` state. Confirms `PACCEPT`/`PDENY` responses are valid for the current PSTATE. Not cycle-accurate, allows a timing window.
+#### Protocol Scoreboard
+- **Description**: Responsible for checking protocol signal correctness (e.g., request/grant, valid/ready) based on transaction state.
+- **Checking Logic**: Predicts expected response state based on stimulus. Confirms protocol compliance within a timing window.
 
-| OCS Engine | Busy Indicator |
-|------------|----------------|
-| DMA        | `dma_on_e` and `dma_off_e` events |
-| SKS        | `sks_busy` variable |
-| PUF        | `puf_key_valid_e` event |
+| Component/Block | Busy Indicator Signal/Event   |
+|-----------------|-------------------------------|
+| Block A         | `block_a_active_event`        |
+| Module B        | `module_b_in_progress_flag`   |
+| Unit C          | `unit_c_done_event`           |
 
-#### Save and Restore Scoreboard
-- **Description**: Snoops save/restore transactions to a local memory model to verify state retention across power cycles.
+#### State Retention Scoreboard
+- **Description**: Snoops save/restore transactions to a local memory model to verify state retention across low-power state transitions.
 
 ### Monitors
-- **P-channel Monitor**: Monitors all P-channel interface signals and broadcasts them via an analysis port.
-- **Save and Restore Monitor**: Monitors signals to create a snoop memory for the scoreboard predictor.
+- **Protocol Monitor**: Monitors all primary protocol interface signals and broadcasts them via an analysis port.
+- **State Monitor**: Monitors internal state signals to assist the scoreboard predictor.
 
 ### Clock and Reset
-- **Description**: Details the clocking domains (`slow_clk`, `side_clk`) and reset signals (`cse_rst_b`, `powergood_rst_b`) and the strategy for driving them in different PSTATES.
+- **Description**: Details the clocking domains (e.g., `core_clk`, `io_clk`) and reset signals (`sys_rst_n`, `power_on_rst_n`) and the strategy for driving them in different operational modes.
 
 ### RAL Modeling
 - **Prediction**: Explicit prediction is used for register values.
@@ -218,21 +218,19 @@ Test cases define the specific stimulus and checking for a feature.
 ```markdown
 ## Test Cases
 
-### Test Scenario: `pstate_accpg_retention_test`
+### Test Scenario: `basic_write_read_test`
 
-- **Objective**: Verify that critical state is retained across an `ACCPG` power transition.
+- **Objective**: Verify a basic write transaction followed by a read transaction to the same address.
 - **Stimulus**:
-    1. Write known values to state retention registers.
-    2. Trigger a `ACCPG` power state transition via the P-channel.
-    3. Wait for the DUT to enter `ACCPG` and then return to `ACTV`.
-    4. Read back the state retention registers.
+    1. Reset the DUT.
+    2. Perform a single write transaction to a valid address with a known data pattern.
+    3. Perform a read transaction from the same address.
 - **Checks**:
-    - Verify that the values read back match the values written before the power transition.
-    - The `puf_key` must be retained.
-    - The P-channel scoreboard must predict correct `PACCEPT` responses.
+    - Verify that the write transaction is acknowledged correctly by the DUT.
+    - Verify that the data read back matches the data that was written.
 - **Coverage**:
-    - `Covergroup: pstate_transitions`: Hits the `ACTV -> ACCPG -> RESTORE -> ACTV` transition.
-    - `Coverpoint: retention_regs`: Covers all specified retention registers.
+    - `Covergroup: basic_transactions`: Hits `WRITE` and `READ` transaction types.
+    - `Coverpoint: address_map`: Covers the specific address region used in the test.
 ```
 
 ### 4.2 Parsing Test Cases
@@ -263,14 +261,15 @@ Signal definitions remain critical and should be provided in clear tabular forma
 ### 5.1 Signal Table Format
 
 ```markdown
-## P-Channel Interface
+## Example Protocol Interface
 
 | Signal Name | Direction | Width | Description |
 |---|---|---|---|
-| `ess_ocs_pchnl_pstate` | Input | M | P-state request from Essential block. |
-| `ocs_ess_pchnl_paccept`| Output | 1 | P-state transition acceptance from OCS. |
-| `ocs_ess_pchnl_pdeny` | Output | 1 | P-state transition denial from OCS. |
-| `ocs_ess_pchnl_pactive`| Output | 7 | Device activity indicator. `pactive[2]` is `PACTIVE_FUNC`. |
+| `proto_req`   | Input  | 1     | Request signal from the master. |
+| `proto_ack`   | Output | 1     | Acknowledge signal from the slave. |
+| `proto_addr`  | Input  | 32    | Address for the transaction. |
+| `proto_wdata` | Input  | 64    | Write data for the transaction. |
+| `proto_rdata` | Output | 64    | Read data from the transaction. |
 ```
 
 ### 5.2 Signal Parsing
