@@ -6,9 +6,12 @@
 
 # Tool Configuration (using Synopsys VCS as an example)
 VCS = vcs
-VCS_FLAGS = -full64 -sverilog +v2k -timescale=1ns/1ps -debug_access+all -ntb_opts uvm
+VCS_FLAGS = -full64 -sverilog +v2k -timescale=1ns/1ps -debug_access+all -ntb_opts uvm -kdb -lca
+VERDI_PLI = -P $(VERDI_HOME)/share/PLI/VCS/linux64/novas.tab $(VERDI_HOME)/share/PLI/VCS/linux64/pli.a
 RUN_ARGS = +UVM_TESTNAME=$(TEST)
-
+ifeq ($(FSDB),1)
+    RUN_ARGS += +DUMP_FSDB
+endif
 
 # Setup tool environment
 export LM_PROJECT := EIG_CSME
@@ -29,7 +32,9 @@ TB_TOP = tb_top.sv
 INTERFACE = fifo_if.sv
 UVM_COMPONENTS = fifo_item.sv fifo_sequences.sv fifo_driver.sv fifo_monitor.sv fifo_scoreboard.sv fifo_agent.sv fifo_env.sv fifo_tests.sv
 TESTBENCH_FILES = $(DUT) $(TB_TOP) $(INTERFACE) $(UVM_COMPONENTS)
-TEST_NAME ?= fifo_base_test
+TEST ?= fifo_base_test
+FSDB ?= 0
+RESULTS_DIR = results/$(TEST)
 
 # Icarus (non-UVM) tool names
 IVERILOG = iverilog
@@ -40,13 +45,20 @@ all: compile
 ## VCS (UVM) targets
 compile:
 	vcs $(VCS_FLAGS) +incdir+$(UVM_HOME)/src $(UVM_HOME)/src/uvm_pkg.sv \
-	$(TESTBENCH_FILES) -o simv
+	$(TESTBENCH_FILES) -o simv $(VERDI_PLI)
 
 run:
-	./simv $(RUN_ARGS)
+	mkdir -p $(RESULTS_DIR)
+	cd $(RESULTS_DIR) && $(CURDIR)/simv $(RUN_ARGS) -l sim.log
 
 run_and_debug: compile
-	./simv +UVM_TESTNAME=$(TEST_NAME) -gui=verdi
+	./simv +UVM_TESTNAME=$(TEST) -gui=verdi
+
+debug_verdi:
+	verdi -ssf novas.fsdb -nologo &
+
+verdi:
+	verdi -ssf $(RESULTS_DIR)/novas.fsdb -dbdir simv.daidir &
 
 ## Icarus Verilog targets for quick directed tests
 iver_wrap:

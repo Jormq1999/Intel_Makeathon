@@ -1,7 +1,7 @@
 
 
 AR=ar
-DOTLIBS=/p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/libvirsim.so /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/liberrorinf.so /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/libsnpsmalloc.so /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/libvfs.so 
+DOTLIBS=/p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/libvirsim.so /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/liberrorinf.so /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/libsnpsmalloc.so /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/lib/libvfs.so /p/hdk/rtl/cad/x86-64_linux44/synopsys/verdi3/V-2023.12-SP2-1/share/PLI/VCS/linux64/pli.a 
 
 uvm_dpi.o : uvm_dpi.d /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm/dpi/uvm_dpi.cc
 	g++ $(CFLAGS)  -c /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm/dpi/uvm_dpi.cc

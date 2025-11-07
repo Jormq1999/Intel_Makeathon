@@ -49,7 +49,7 @@ CRT0=
 # C run time startup
 CRTN=
 # Machine specific libraries
-SYSLIBS=/p/hdk/rtl/cad/x86-64_linux44/synopsys/verdi3/V-2023.12-SP2-1/share/PLI/VCS/SUSE64/pli.a -ldl  -lc -lm -lpthread -ldl
+SYSLIBS=/p/hdk/rtl/cad/x86-64_linux44/synopsys/verdi3/V-2023.12-SP2-1/share/PLI/VCS/SUSE64/pli.a -ldl -lm  -lc -lpthread -ldl
 
 # Default defines
 SHELL=/bin/sh
@@ -81,7 +81,7 @@ CFLAGS_O0+=$(STDLIB)
 LD_PARTIAL_LOADER=ld
 # Partial linking
 LD_PARTIAL=$(LD_PARTIAL_LOADER) -r -o
-LIBS=-lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs 
+LIBS=-lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs /p/hdk/rtl/cad/x86-64_linux44/synopsys/verdi3/V-2023.12-SP2-1/share/PLI/VCS/linux64/pli.a 
 # Note: if make gives you errors about include, either get gmake, or
 # replace the following line with the contents of the file filelist,
 # EACH TIME IT CHANGES

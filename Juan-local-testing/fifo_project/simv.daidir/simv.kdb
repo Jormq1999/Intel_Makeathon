@@ -6,16 +6,20 @@ VCS_HOME=/p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1
 VERDI_HOME=/p/hdk/rtl/cad/x86-64_linux44/synopsys/verdi3/V-2023.12-SP2-1
 SystemC=FALSE
 UUM=FALSE
-KDB=FALSE
+KDB=TRUE
 USE_NOVAS_HOME=FALSE
 COSIM=FALSE
 TOP=uvm_custom_install_recording uvm_custom_install_verdi_recording tb_top 
 OPTION=-ssv -ssy 
 ELAB_OPTION=-ssv -ssy 
+ELAB=TRUE
+SIMV_WRAPPER=FALSE
+[vcs]
+RUN_ELABCOM=unset TURBO_LOG_DIR ;\rm -rf /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/elabcomLog ;/p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/suse64/bin/elabcom -logdir /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/elabcomLog  -simvdaidir /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir  -lib /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/work  -saveLevel  -elab /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/kdb -simflow -simdir /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/kdb_libs -topfile /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/.elabcomTopFile -ssv -ssy  -Lf work +disable_message+C00380+C00381 +disable_message+C00388+C00389  >& /dev/null  && echo Success >& /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/.elabcomReport || echo Fail >& /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/.elabcomReport; \rm -rf /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/work.lib++ /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/simv.daidir/kdb_libs/ 
 
 [Value]
 WREALX=ffff534e50535f58
 WREALZ=ffff534e50535f5a
 
 [CompInfo]
-FLOW_OPTS=-ssv -ssy 
+FLOW_OPTS=-kdb -ssv -ssy 
