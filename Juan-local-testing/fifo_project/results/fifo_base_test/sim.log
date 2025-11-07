@@ -1,0 +1,43 @@
+Command: /nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/./simv +UVM_TESTNAME=test_write_to_full +DUMP_FSDB -l results/fifo_base_test/sim.log
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version V-2023.12-SP2-1_Full64; Runtime version V-2023.12-SP2-1_Full64;  Nov  7 00:35 2025
+----------------------------------------------------------------
+UVM-1.1d.Synopsys
+(C) 2007-2013 Mentor Graphics Corporation
+(C) 2007-2013 Cadence Design Systems, Inc.
+(C) 2006-2013 Synopsys, Inc.
+(C) 2011-2013 Cypress Semiconductor Corp.
+----------------------------------------------------------------
+
+  ***********       IMPORTANT RELEASE NOTES         ************
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_NO_DEPRECATED undefined.
+  See http://www.eda.org/svdb/view.php?id=3313 for more details.
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_OBJECT_MUST_HAVE_CONSTRUCTOR undefined.
+  See http://www.eda.org/svdb/view.php?id=3770 for more details.
+
+      (Specify +UVM_NO_RELNOTES to turn off this notice)
+
+UVM_INFO @ 0: reporter [RNTST] Running test test_write_to_full...
+UVM_INFO /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm/base/uvm_objection.svh(1274) @ 495000: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+
+--- UVM Report Summary ---
+
+** Report counts by severity
+UVM_INFO :    2
+UVM_WARNING :    0
+UVM_ERROR :    0
+UVM_FATAL :    0
+** Report counts by id
+[RNTST]     1
+[TEST_DONE]     1
+$finish called from file "/p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm/base/uvm_root.svh", line 437.
+$finish at simulation time               495000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 495000 ps
+CPU Time:      0.190 seconds;       Data structure size:   0.5Mb
+Fri Nov  7 00:35:32 2025

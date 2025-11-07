@@ -1,0 +1,14 @@
+{
+    "environments": [
+        {
+            "id": "fifo_project",
+            "name": "FIFO Project",
+            "path": "/nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project"
+        },
+        {
+            "id": "ip_csme",
+            "name": "IP CSME Verification",
+            "path": "/nfs/site/disks/juanpsal_disk_002/iscp-fst/ip-csme/verif"
+        }
+    ]
+}

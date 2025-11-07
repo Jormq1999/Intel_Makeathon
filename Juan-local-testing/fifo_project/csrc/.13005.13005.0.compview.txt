@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1762505428.320907047, "rt":6.52, "ut":5.77, "st":0.21}}
+{"vcselab":{"timestamp_begin":1762505434.876388152, "rt":0.41, "ut":0.12, "st":0.03}}
+{"link":{"timestamp_begin":1762505435.316154416, "rt":1.20, "ut":0.18, "st":0.11}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1762505427.991033753}
+{"VCS_COMP_START_TIME": 1762505427.991033753}
+{"VCS_COMP_END_TIME": 1762505436.764127310}
+{"VCS_USER_OPTIONS": "-full64 -sverilog +v2k -timescale=1ns/1ps -debug_access+all -ntb_opts uvm -kdb -lca +incdir+/p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm-1.2/src /p/hdk/rtl/cad/x86-64_linux44/synopsys/vcsmx/V-2023.12-SP2-1/etc/uvm-1.2/src/uvm_pkg.sv fifo.sv tb_top.sv fifo_if.sv fifo_item.sv fifo_sequences.sv fifo_driver.sv fifo_monitor.sv fifo_scoreboard.sv fifo_agent.sv fifo_env.sv fifo_tests.sv -o simv -P /p/hdk/rtl/cad/x86-64_linux44/synopsys/verdi3/V-2023.12-SP2-1/share/PLI/VCS/linux64/novas.tab /p/hdk/rtl/cad/x86-64_linux44/synopsys/verdi3/V-2023.12-SP2-1/share/PLI/VCS/linux64/pli.a"}
+{"vcs1": {"peak_mem": 472664}}
+{"vcselab": {"peak_mem": 188460}}

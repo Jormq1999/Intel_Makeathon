@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Verification Environment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 40px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .list-group-item {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Select a Verification Environment</h1>
+        <div class="list-group">
+            {% for env in environments %}
+                <a href="{{ url_for('project_dashboard', env_id=env.id) }}" class="list-group-item list-group-item-action">
+                    {{ env.name }}
+                </a>
+            {% else %}
+                <div class="list-group-item">No environments configured. Please check your <code>config.json</code>.</div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

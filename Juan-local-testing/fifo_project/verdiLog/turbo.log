@@ -1,0 +1,5 @@
+Command Line: /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/bin/Novas -ssf results/test_write_to_full/novas.fsdb -dbdir simv.daidir
+uname(Linux sccf06171304 4.12.14-122.255-default #1 SMP Mon Apr 7 18:39:14 UTC 2025 (9096f7f/lp-70c77c6) x86_au time 998.076899 10.646888 12.066701 delta 199229440 199229440 total 825217024 825217024
+System: Linux sccf06171304 4.12.14-122.255-default #1 SMP Mon Apr 7 18:39:14 UTC 2025 (9096f7f/lp-70c77c6) x86_64
+Total memory used: 844169216
+Run time: Fri Nov  7 00:53:10 2025

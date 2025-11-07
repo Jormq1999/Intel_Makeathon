@@ -1,0 +1,82 @@
+Thread 3 (Thread 0x7fffea011700 (LWP 12096) "Novas"):
+#0  0x00007ffff027ec63 in select () at /lib64/libc.so.6
+#1  0x000000000c87262a in NotifierThreadProc ()
+#2  0x000000000c8d2989 in sdp_wrap_start_routine ()
+#3  0x00007ffff639f6ca in start_thread () at /lib64/noelision/libpthread.so.0
+#4  0x00007ffff028621d in clone () at /lib64/libc.so.6
+Thread 2 (Thread 0x7fffeead0700 (LWP 11698) "Novas"):
+#0  0x00007ffff025546d in nanosleep () at /lib64/libc.so.6
+#1  0x00007ffff0255304 in sleep () at /lib64/libc.so.6
+#2  0x0000000009b96a76 in LicenseCheckUtility ()
+#3  0x000000000c8d2989 in sdp_wrap_start_routine ()
+#4  0x00007ffff639f6ca in start_thread () at /lib64/noelision/libpthread.so.0
+#5  0x00007ffff028621d in clone () at /lib64/libc.so.6
+Thread 1 (Thread 0x7fffeee6c140 (LWP 11690) "Novas"):
+#0  0x00007ffff0205613 in _IO_proc_close@@GLIBC_2.2.5 () at /lib64/libc.so.6
+#1  0x00007ffff020f120 in __GI__IO_file_close_it () at /lib64/libc.so.6
+#2  0x00007ffff0203a10 in fclose@@GLIBC_2.2.5 () at /lib64/libc.so.6
+#3  0x000000000c9ab059 in _sys_pclose ()
+#4  0x000000000c94b257 in system ()
+#5  0x000000000c937f1f in sysiCrash ()
+#6  0x000000000c938458 in actUnexpectAction ()
+#7  0x000000000c9384c2 in catchSignalCB ()
+#8  0x000000000b71049f in _anrep_handler_signal ()
+#9  0x00007ffff01ce140 in <signal handler called> () at /lib64/libc.so.6
+#10 0x00007ffff571010a in QWidget::releaseShortcut(int) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#11 0x00007ffff5a4ef73 in QLabelPrivate::clearContents() () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#12 0x00007ffff5a4f205 in QLabel::~QLabel() () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#13 0x00007ffff5a4f229 in QLabel::~QLabel() () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#14 0x00007ffff51ad6d2 in QObjectPrivate::deleteChildren() () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtCore.so.4
+#15 0x00007ffff571518c in QWidget::~QWidget() () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#16 0x0000000009a018a7 in QwDialog::~QwDialog() ()
+#17 0x0000000009718afd in qBaseDialog_V::~qBaseDialog_V() ()
+#18 0x00000000058adebd in impSDF_C::~impSDF_C() ()
+#19 0x00007ffff01d09c9 in __run_exit_handlers () at /lib64/libc.so.6
+#20 0x00007ffff01d0a15 in  () at /lib64/libc.so.6
+#21 0x00007ffff5731548 in  () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#22 0x00007ffff0c1f55e in _XIOError () at /usr/lib64/libX11.so.6
+#23 0x00007ffff0c1d6ea in _XReply () at /usr/lib64/libX11.so.6
+#24 0x000000000c8cb8e8 in _XReply ()
+#25 0x00007ffff0c048d4 in _XGetWindowAttributes () at /usr/lib64/libX11.so.6
+#26 0x00007ffff0c04a41 in XGetWindowAttributes () at /usr/lib64/libX11.so.6
+#27 0x00007ffff579c698 in QPixmap::grabWindow(unsigned long, int, int, int, int) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#28 0x00000000096d73ff in qDockerWindow_C::_saveSessionState(QString const&) ()
+#29 0x00000000096e7ede in qDockerWindowMgr_C::saveDockersState(QString const&) ()
+#30 0x00000000096e7fac in qDockerWindowMgr_C::saveSessionState(QString const&) ()
+#31 0x00000000096ba414 in qDockerWindow_C::saveSessionEnd(rcFile*) ()
+#32 0x00000000058d5404 in saveSession(char*, srcSesOption_S const&) ()
+#33 0x00000000058d6236 in autoSaveSessionCB(char*) ()
+#34 0x00000000084c02f4 in autoBackup_C::backup() ()
+#35 0x00000000084164b9 in prefAutoSaveUtil_C::ExitSave() ()
+#36 0x00000000057c8c32 in debussyExit(_wtHierBrowserRec*, char) ()
+#37 0x00000000057c9154 in hbExitUI(_wtWindowRec*, int, char**, void*) ()
+#38 0x0000000003561b10 in novasQMainWin_C::closeEvent(QCloseEvent*) ()
+#39 0x00007ffff571af26 in QWidget::event(QEvent*) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#40 0x00007ffff5a63a6b in QMainWindow::event(QEvent*) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#41 0x00000000099a9983 in QwMainWindow::event(QEvent*) ()
+#42 0x00007ffff56d39fc in QApplicationPrivate::notify_helper(QObject*, QEvent*) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#43 0x00007ffff56d7a4b in QApplication::notify(QObject*, QEvent*) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#44 0x000000000997c1d8 in QwApplication::notify(QObject*, QEvent*) ()
+#45 0x00007ffff519cf7e in QCoreApplication::notifyInternal(QObject*, QEvent*) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtCore.so.4
+#46 0x00007ffff5714ca9 in QWidgetPrivate::close_helper(QWidgetPrivate::CloseMode) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#47 0x00007ffff573fd0f in QApplication::x11ClientMessage(QWidget*, _XEvent*, bool) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#48 0x00007ffff573e556 in QApplication::x11ProcessEvent(_XEvent*) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtGui.so.4
+#49 0x000000000999ee8a in qmotif_event_dispatcher(_XEvent*) ()
+#50 0x00007ffff0f55769 in XtDispatchEvent () at /usr/lib64/libXt.so.6
+#51 0x00007ffff0f60c7e in XtAppProcessEvent () at /usr/lib64/libXt.so.6
+#52 0x000000000999e177 in QtMotif::processEvents(QFlags<QEventLoop::ProcessEventsFlag>) ()
+#53 0x00007ffff519be2f in QEventLoop::processEvents(QFlags<QEventLoop::ProcessEventsFlag>) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtCore.so.4
+#54 0x00007ffff519c0c8 in QEventLoop::exec(QFlags<QEventLoop::ProcessEventsFlag>) () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtCore.so.4
+#55 0x00007ffff519fe3c in QCoreApplication::exec() () at /p/hdk/rtl/cad/x86-64_linux412/synopsys/verdi3/V-2023.12-SP2-1/platform/SUSE64/lib/Qt/libQtCore.so.4
+#56 0x000000000997070b in QwApplication::exec() ()
+#57 0x0000000003526e50 in FUNC_DEBMAIN_LOOP() ()
+#58 0x0000000003530150 in main ()
+---------------
+branchName=Verdi_V-2023.12-SP2-1 cnlDate=-- Mon Jul 15 02:51:00 PDT 2024 cnlEnv=Linux.0/64bit
+uname(Linux sccf06171304 4.12.14-122.255-default #1 SMP Mon Apr 7 18:39:14 UTC 2025 (9096f7f/lp-70c77c6) x86_64)
+---------------
+Process Size: 844169216 bytes
+verdi detected abnormal termination.
+Log information written to
+/nfs/site/disks/juanpsal_disk_002/iscp-fst/Intel_Makeathon/Juan-local-testing/fifo_project/verdiLog/sysinfo_Nov07_0052.tar.
+Please send this file to customer support.
