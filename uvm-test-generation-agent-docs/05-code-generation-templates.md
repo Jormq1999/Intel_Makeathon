@@ -15,10 +15,33 @@ class CodeGenerator:
         self.version = version
         self.templates = self.load_templates()
         
+    def generate_or_modify_component(self, component_type, parameters, change_type='major', target_file=None):
+        """Decides whether to generate a new component or modify an existing one."""
+        if change_type == 'minor' and target_file:
+            return self.patch_component(component_type, parameters, target_file)
+        else:
+            return self.generate_component(component_type, parameters)
+
     def generate_component(self, component_type, parameters):
+        """Generates a full component from a template."""
         template = self.templates[component_type]
         return template.render(**parameters)
         
+    def patch_component(self, component_type, parameters, target_file):
+        """Generates a code snippet and patches it into an existing file."""
+        # 'component_type' here might refer to a snippet, e.g., 'constraint_snippet'
+        snippet_template = self.templates.get(f"{component_type}_snippet")
+        if not snippet_template:
+            return f"Error: No snippet template found for {component_type}"
+            
+        code_snippet = snippet_template.render(**parameters)
+        
+        # Pseudocode for patching the file
+        # original_code = read_file(target_file)
+        # patched_code = insert_snippet(original_code, code_snippet, parameters['insertion_point'])
+        # write_file(target_file, patched_code)
+        return f"Component {target_file} patched with new {component_type}."
+
     def generate_testbench(self, architecture, components):
         # Generate complete testbench from components
         testbench_code = []
@@ -60,6 +83,44 @@ graph TD
     F --> F1[Agent Config]
     F --> F2[Environment Config]
 ```
+
+### 1.3 Modifying Existing Components
+
+For minor changes (`VAL_DCN` indicating a modification), the agent should avoid regenerating entire files. Instead, it can use specialized "snippet" templates to generate only the required piece of code (e.g., a new constraint, a coverpoint, or a modified task) and then insert it into the appropriate location in an existing file.
+
+**Example: Generating a Constraint Snippet**
+
+A template for just a UVM constraint might look like this:
+
+```systemverilog
+// Template: constraint_snippet.sv
+constraint {{ constraint_name }} {
+  {{ constraint_body }};
+}
+```
+
+The `CodeGenerator` would use this template to generate the constraint text and then a separate function would be responsible for parsing the target SystemVerilog file to find the correct class to insert it into.
+
+```python
+def patch_existing_sequence(file_path, new_constraint_params):
+    """
+    Generates a constraint snippet and inserts it into a sequence file.
+    """
+    generator = CodeGenerator()
+    
+    # Generate just the constraint code
+    constraint_snippet = generator.generate_or_modify_component(
+        component_type='constraint', 
+        parameters=new_constraint_params,
+        change_type='minor',
+        target_file=file_path 
+    )
+    
+    # The 'patch_component' method (called internally) would handle the file modification
+    print(f"Patching {file_path} with new constraint.")
+```
+
+This approach is more efficient and less error-prone for small, targeted updates.
 
 ## 2. Component Templates
 
@@ -966,6 +1027,7 @@ endclass
 4. **Documentation**: Include inline documentation in templates
 5. **Methodology Compliance**: Ensure templates follow methodology guidelines
 6. **Maintenance**: Keep templates updated with methodology changes
+7. **Incremental Updates**: For minor changes, use templates to generate code snippets and patch existing files rather than regenerating them entirely. This preserves existing logic and reduces review overhead.
 
 ---
 
