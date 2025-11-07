@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide defines the expected format and structure for validation documents that the UVM test generation agent will parse. The agent requires properly formatted documents to extract sequences, signals, architecture, and coverage requirements.
+This guide defines the expected format and structure for validation documents that the UVM test generation agent will parse. The agent requires properly formatted documents to extract sequences, signals, architecture, and coverage requirements. A well-structured document is critical for successful automated test generation.
 
 ## 1. Supported Document Formats
 
@@ -49,47 +49,79 @@ def detect_document_format(file_path):
 
 ### 2.1 Mandatory Sections
 
+A comprehensive validation document should be organized into the following primary sections. While the exact naming can vary, the agent will look for content corresponding to these concepts.
+
 ```markdown
-# Validation Plan: [Test Name]
+# Validation Plan: [Project Name]
 
-## 1. Test Overview
-- **Protocol**: [Protocol Name]
-- **Methodology**: [UVM/OVM/Saola]
-- **Scope**: [Block/System/Integration]
+## 1. Overview and Scope
+- **PCR Title**: [Title of the change]
 - **DUT**: [Design Under Test]
+- **Brief Description**: High-level summary of the project or changes.
 
-## 2. Test Architecture
-[Architecture description and component hierarchy]
+## 2. Verification Specification (Verif A-Spec)
+### 2.1 DUT Summary
+[Detailed DUT description]
 
-## 3. Sequences
-[Sequence definitions and parameters]
+### 2.2 Block Diagrams
+[Verification-centric block diagram, component connections]
 
-## 4. Signals and Interfaces
-[Signal definitions and interface specifications]
+### 2.3 Component Hierarchy
+- **Environments**: Top-level and feature-specific environments.
+- **BFMs**: Bus Functional Models used.
+- **Scoreboards**: Description of each scoreboard's purpose and checking logic.
+- **Monitors**: Description of each monitor's purpose.
+- **Clock and Reset**: Clocking and reset architecture.
+- **RAL Modeling**: Register Abstraction Layer strategy.
 
-## 5. Coverage Requirements
-[Functional and code coverage specifications]
+### 2.4 Test Bench Details
+[DUT instantiation, memory models, UPF details]
 
-## 6. Build and Execution
-[Build requirements and execution parameters]
+### 2.5 Checking Strategy
+[Details on scoreboards, assertions, and self-checking tests]
+
+### 2.6 Coverage Strategy
+[Functional, code, and assertion coverage goals]
+
+## 3. Test Plan
+### 3.1 Test Cases / Scenarios
+[List of specific tests, their purpose, and stimulus]
+
+### 3.2 Checklists
+[Validation checklists for registers, features, errors, etc.]
 ```
 
 ### 2.2 Section Identification Patterns
 
+The agent uses regular expressions to identify the key sections within the document.
+
 ```python
 section_patterns = {
-    'test_overview': [
-        r'#+ .*[Tt]est [Oo]verview',
+    'overview': [
         r'#+ .*[Oo]verview',
-        r'#+ .*[Ss]ummary'
+        r'#+ .*[Bb]rief [Dd]escription',
+        r'#+ .*[Aa]ffected [Dd]atabase'
     ],
-    'architecture': [
-        r'#+ .*[Aa]rchitecture',
-        r'#+ .*[Tt]estbench',
-        r'#+ .*[Ee]nvironment'
+    'verification_spec': [
+        r'#+ .*[Vv]erif [Aa]-[Ss]pec',
+        r'#+ .*[Vv]erification [Ss]pecification'
     ],
-    'sequences': [
-        r'#+ .*[Ss]equences?',
+    'component_hierarchy': [
+        r'#+ .*[Cc]omponent [Hh]ierarchy'
+    ],
+    'test_bench': [
+        r'#+ .*[Tt]est [Bb]ench'
+    ],
+    'checking_strategy': [
+        r'#+ .*[Cc]hecking [Ss]trategy'
+    ],
+    'coverage': [
+        r'#+ .*[Cc]overage [Ss]trategy'
+    ],
+    'test_plan': [
+        r'#+ .*[Tt]est [Pp]lan'
+    ],
+    'test_cases': [
         r'#+ .*[Tt]est [Cc]ases?',
         r'#+ .*[Ss]cenarios?'
     ],
@@ -97,183 +129,147 @@ section_patterns = {
         r'#+ .*[Ss]ignals?',
         r'#+ .*[Ii]nterfaces?',
         r'#+ .*[Pp]orts?'
-    ],
-    'coverage': [
-        r'#+ .*[Cc]overage',
-        r'#+ .*[Vv]erification'
     ]
 }
 ```
 
-## 3. Test Overview Format
+## 3. Verification Specification Format
 
-### 3.1 Basic Information
+This section details the structure for the core verification components.
+
+### 3.1 Component Hierarchy Format
+
+This section is critical for understanding the testbench structure.
 
 ```markdown
-## Test Overview
+## Component Hierarchy
 
-**Protocol**: AXI4-Stream  
-**Methodology**: UVM 1.2  
-**Scope**: Block-level verification  
-**DUT**: Stream Processor IP  
-**Test Duration**: 10,000 clock cycles  
-**Random Seed**: Configurable  
+### Environments
+- **Path**: `/path/to/top_env.sv`
+- **Description**: The top-level environment that integrates all other components.
 
-### Test Objectives
-- Verify AXI4-Stream protocol compliance
-- Test data integrity through the stream processor
-- Validate backpressure handling
-- Ensure proper error handling
+### BFMs
+- **`protocol_a_bfm`**: Handles Protocol A interactions.
+- **`protocol_b_bfm`**: Manages Protocol B primary and sideband traffic.
 
-### Test Environment
-- **Testbench Architecture**: Single-agent UVM environment
-- **Clocking**: 100MHz system clock
-- **Reset**: Asynchronous reset, active low
-- **Interfaces**: AXI4-Stream input/output
+### Scoreboards
+
+#### Protocol Scoreboard
+- **Description**: Responsible for checking protocol signal correctness (e.g., request/grant, valid/ready) based on transaction state.
+- **Checking Logic**: Predicts expected response state based on stimulus. Confirms protocol compliance within a timing window.
+
+| Component/Block | Busy Indicator Signal/Event   |
+|-----------------|-------------------------------|
+| Block A         | `block_a_active_event`        |
+| Module B        | `module_b_in_progress_flag`   |
+| Unit C          | `unit_c_done_event`           |
+
+#### State Retention Scoreboard
+- **Description**: Snoops save/restore transactions to a local memory model to verify state retention across low-power state transitions.
+
+### Monitors
+- **Protocol Monitor**: Monitors all primary protocol interface signals and broadcasts them via an analysis port.
+- **State Monitor**: Monitors internal state signals to assist the scoreboard predictor.
+
+### Clock and Reset
+- **Description**: Details the clocking domains (e.g., `core_clk`, `io_clk`) and reset signals (`sys_rst_n`, `power_on_rst_n`) and the strategy for driving them in different operational modes.
+
+### RAL Modeling
+- **Prediction**: Explicit prediction is used for register values.
+- **HDL Paths**: All register paths are checked. Exceptions are documented.
 ```
 
-### 3.2 Parsing Rules
+### 3.2 Parsing Component Hierarchy
 
 ```python
-def parse_test_overview(section_text):
-    overview = {
-        'protocol': extract_field(section_text, r'\*\*Protocol\*\*:?\s*([^\n]+)'),
-        'methodology': extract_field(section_text, r'\*\*Methodology\*\*:?\s*([^\n]+)'),
-        'scope': extract_field(section_text, r'\*\*Scope\*\*:?\s*([^\n]+)'),
-        'dut': extract_field(section_text, r'\*\*DUT\*\*:?\s*([^\n]+)'),
-        'objectives': extract_list(section_text, r'### Test Objectives([\s\S]*?)(?=###|$)'),
-        'architecture': extract_field(section_text, r'\*\*Testbench Architecture\*\*:?\s*([^\n]+)')
+def parse_component_hierarchy(section_text):
+    hierarchy = {
+        'environments': extract_key_value_list(section_text, 'Environments'),
+        'bfms': extract_key_value_list(section_text, 'BFMs'),
+        'scoreboards': parse_scoreboard_details(section_text),
+        'monitors': extract_key_value_list(section_text, 'Monitors'),
+        'clock_reset': extract_description(section_text, 'Clock and Reset'),
+        'ral': extract_key_value_list(section_text, 'RAL Modeling')
     }
-    return overview
-```
+    return hierarchy
 
-## 4. Sequence Format
-
-### 4.1 Sequence Definition
-
-```markdown
-## Sequences
-
-### 4.1 Basic Write Sequence
-
-**Description**: Single AXI4-Stream write transaction  
-**Type**: Directed  
-**Duration**: 50 clock cycles  
-**Parameters**:
-- `data_width`: 32 bits
-- `transfer_size`: Variable (1-16 beats)
-- `data_pattern`: Incremental
-
-**Implementation**:
-```systemverilog
-class basic_write_seq extends uvm_sequence#(axi_stream_item);
-  rand int transfer_size;
-  rand bit [31:0] start_data;
-  
-  constraint c_transfer_size {
-    transfer_size inside {[1:16]};
-  }
-  
-  virtual task body();
-    for (int i = 0; i < transfer_size; i++) begin
-      `uvm_do_with(req, {
-        tdata == start_data + i;
-        tlast == (i == transfer_size - 1);
-      })
-    end
-  endtask
-endclass
-```
-
-**Signals Used**:
-- `tdata[31:0]`: Transfer data
-- `tvalid`: Data valid
-- `tready`: Ready for data
-- `tlast`: Last transfer
-- `tkeep[3:0]`: Byte enables
-```
-
-### 4.2 Parsing Sequence Definitions
-
-```python
-def parse_sequences(section_text):
-    sequences = []
-    
-    # Find sequence blocks
-    sequence_pattern = r'### \d+\.\d+ ([^\n]+)\n([\s\S]*?)(?=### \d+\.\d+|$)'
-    matches = re.findall(sequence_pattern, section_text)
+def parse_scoreboard_details(section_text):
+    scoreboards = []
+    sb_pattern = r'#### ([^\n]+) Scoreboard\n([\s\S]*?)(?=####|$)'
+    matches = re.findall(sb_pattern, section_text)
     
     for name, content in matches:
-        sequence = {
-            'name': clean_sequence_name(name),
+        scoreboard = {
+            'name': name.strip(),
             'description': extract_field(content, r'\*\*Description\*\*:?\s*([^\n]+)'),
-            'type': extract_field(content, r'\*\*Type\*\*:?\s*([^\n]+)'),
-            'duration': extract_field(content, r'\*\*Duration\*\*:?\s*([^\n]+)'),
-            'parameters': parse_parameters(content),
-            'implementation': extract_code_block(content, 'systemverilog'),
-            'signals_used': parse_signals_used(content)
+            'checking_logic': extract_field(content, r'\*\*Checking Logic\*\*:?\s*([^\n]+)'),
+            'signal_table': parse_markdown_table(content)
         }
-        sequences.append(sequence)
-    
-    return sequences
+        scoreboards.append(scoreboard)
+    return scoreboards
+```
 
-def parse_parameters(content):
-    parameters = {}
-    param_section = extract_section(content, r'\*\*Parameters\*\*:([\s\S]*?)(?=\*\*|$)')
+## 4. Test Plan Format
+
+### 4.1 Test Case / Scenario Format
+
+Test cases define the specific stimulus and checking for a feature.
+
+```markdown
+## Test Cases
+
+### Test Scenario: `basic_write_read_test`
+
+- **Objective**: Verify a basic write transaction followed by a read transaction to the same address.
+- **Stimulus**:
+    1. Reset the DUT.
+    2. Perform a single write transaction to a valid address with a known data pattern.
+    3. Perform a read transaction from the same address.
+- **Checks**:
+    - Verify that the write transaction is acknowledged correctly by the DUT.
+    - Verify that the data read back matches the data that was written.
+- **Coverage**:
+    - `Covergroup: basic_transactions`: Hits `WRITE` and `READ` transaction types.
+    - `Coverpoint: address_map`: Covers the specific address region used in the test.
+```
+
+### 4.2 Parsing Test Cases
+
+```python
+def parse_test_cases(section_text):
+    test_cases = []
+    test_pattern = r'### Test Scenario: `([^`]+)`\n([\s\S]*?)(?=### Test Scenario:|$)'
+    matches = re.findall(test_pattern, section_text)
     
-    if param_section:
-        param_lines = re.findall(r'- `([^`]+)`: ([^\n]+)', param_section)
-        for name, description in param_lines:
-            parameters[name] = description.strip()
+    for name, content in matches:
+        test_case = {
+            'name': name.strip(),
+            'objective': extract_field(content, r'- \*\*Objective\*\*:?\s*([^\n]+)'),
+            'stimulus': extract_list_items(extract_section(content, r'- \*\*Stimulus\*\*:([\s\S]*?)(?=- \*\*)')),
+            'checks': extract_list_items(extract_section(content, r'- \*\*Checks\*\*:([\s\S]*?)(?=- \*\*)')),
+            'coverage': extract_list_items(extract_section(content, r'- \*\*Coverage\*\*:([\s\S]*?)(?=$)'))
+        }
+        test_cases.append(test_case)
     
-    return parameters
+    return test_cases
 ```
 
 ## 5. Signal and Interface Format
 
-### 5.1 Signal Definitions
+Signal definitions remain critical and should be provided in clear tabular format.
+
+### 5.1 Signal Table Format
 
 ```markdown
-## Signals and Interfaces
+## Example Protocol Interface
 
-### 5.1 AXI4-Stream Interface
-
-**Interface Name**: `axi_stream_if`  
-**Protocol**: AXI4-Stream  
-**Data Width**: 32 bits  
-**Direction**: Bidirectional  
-
-#### Signal List
-
-| Signal Name | Width | Direction | Description |
-|-------------|-------|-----------|-------------|
-| `tdata` | 32 | Master → Slave | Transfer data |
-| `tvalid` | 1 | Master → Slave | Data valid |
-| `tready` | 1 | Slave → Master | Ready for data |
-| `tlast` | 1 | Master → Slave | Last transfer |
-| `tkeep` | 4 | Master → Slave | Byte enables |
-| `tuser` | 8 | Master → Slave | User signals |
-
-#### Timing Requirements
-
-- **Setup Time**: 2ns before clock edge
-- **Hold Time**: 1ns after clock edge
-- **Clock Frequency**: 100MHz
-- **Reset**: Asynchronous, active low
-
-#### Protocol Constraints
-
-- `tvalid` must remain high until `tready` is asserted
-- `tlast` indicates the final beat of a packet
-- `tkeep` bits correspond to `tdata` byte lanes
-- All signals must be stable during valid transfers
-
-### 5.2 Clock and Reset Signals
-
-| Signal Name | Width | Direction | Description |
-|-------------|-------|-----------|-------------|
-| `clk` | 1 | Input | System clock |
-| `rst_n` | 1 | Input | Async reset (active low) |
+| Signal Name | Direction | Width | Description |
+|---|---|---|---|
+| `proto_req`   | Input  | 1     | Request signal from the master. |
+| `proto_ack`   | Output | 1     | Acknowledge signal from the slave. |
+| `proto_addr`  | Input  | 32    | Address for the transaction. |
+| `proto_wdata` | Input  | 64    | Write data for the transaction. |
+| `proto_rdata` | Output | 64    | Read data from the transaction. |
 ```
 
 ### 5.2 Signal Parsing
@@ -281,44 +277,32 @@ def parse_parameters(content):
 ```python
 def parse_signals(section_text):
     interfaces = []
-    
-    # Extract interface sections
-    interface_pattern = r'### \d+\.\d+ ([^\n]+)\n([\s\S]*?)(?=### \d+\.\d+|$)'
+    # Matches tables under headings like "## P-Channel Interface"
+    interface_pattern = r'## ([^\n]+) Interface\n([\s\S]*?)(?=##|$)'
     matches = re.findall(interface_pattern, section_text)
     
     for name, content in matches:
         interface = {
-            'name': extract_field(content, r'\*\*Interface Name\*\*:?\s*`([^`]+)`'),
-            'protocol': extract_field(content, r'\*\*Protocol\*\*:?\s*([^\n]+)'),
-            'data_width': extract_field(content, r'\*\*Data Width\*\*:?\s*([^\n]+)'),
-            'direction': extract_field(content, r'\*\*Direction\*\*:?\s*([^\n]+)'),
-            'signals': parse_signal_table(content),
-            'timing': parse_timing_requirements(content),
-            'constraints': parse_protocol_constraints(content)
+            'name': name.strip(),
+            'signals': parse_markdown_table(content)
         }
         interfaces.append(interface)
     
     return interfaces
 
-def parse_signal_table(content):
+def parse_markdown_table(content):
     signals = []
+    # Generic markdown table parser
+    rows = re.findall(r'\| `?([^|`]+)`? \| `?([^|`]+)`? \| `?([^|`]+)`? \| `?([^|`]+)`? \|', content)
+    # header_pattern: \| Signal Name \| Direction \| Width \| Description \|
     
-    # Find markdown table
-    table_pattern = r'\| Signal Name \| Width \| Direction \| Description \|\n\|[^\n]+\|\n([\s\S]*?)(?=\n\n|$)'
-    match = re.search(table_pattern, content)
-    
-    if match:
-        table_content = match.group(1)
-        rows = re.findall(r'\| `([^`]+)` \| ([^|]+) \| ([^|]+) \| ([^|]+) \|', table_content)
-        
-        for name, width, direction, description in rows:
-            signals.append({
-                'name': name.strip(),
-                'width': parse_width(width.strip()),
-                'direction': direction.strip(),
-                'description': description.strip()
-            })
-    
+    for name, direction, width, description in rows:
+        signals.append({
+            'name': name.strip(),
+            'direction': direction.strip(),
+            'width': width.strip(),
+            'description': description.strip()
+        })
     return signals
 ```
 
@@ -593,12 +577,12 @@ def resolve_document_issues(parsed_doc, issues):
 
 ## Best Practices
 
-1. **Consistent Structure**: Use standardized section headers and formatting
-2. **Complete Information**: Include all required fields for sequences and signals
-3. **Clear Descriptions**: Provide detailed descriptions for all components
-4. **Code Examples**: Include SystemVerilog implementation examples
-5. **Validation**: Validate documents before processing
-6. **Version Control**: Track document versions and changes
+1. **Follow the Structure**: Adhere to the defined section hierarchy for reliable parsing.
+2. **Use Markdown Tables**: Define signals, scoreboards, and checklists in tables.
+3. **Be Specific**: Provide clear, unambiguous descriptions for test cases, checking logic, and components.
+4. **Include Paths**: When possible, include file system paths to relevant environment or component files.
+5. **Separate Concerns**: Keep verification specifications distinct from the test plan.
+6. **Version Control**: Track document versions and changes.
 
 ---
 

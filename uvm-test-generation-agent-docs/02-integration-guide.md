@@ -10,27 +10,78 @@ This guide describes how to integrate extracted sequences, signals, and test str
 
 ```mermaid
 graph TD
-    A[Extracted Components] --> B[Signal Mapping]
-    B --> C[Sequence Integration]
-    C --> D[Test Assembly]
-    D --> E[Validation & Verification]
+    A[Extracted Components] --> B[Analyze Change Impact]
+    B -->|Minor Change| C[Identify & Modify Existing Components]
+    B -->|Major Change| D[Full Generation Path]
+    
+    D --> D1[Reference Search & Reuse]
+    D1 --> D2[Component Generation]
+    D2 --> D3[Sequence Integration]
+    D3 --> D4[Test Assembly]
+    
+    C --> E[Validation & Verification]
+    D4 --> E
     E --> F[Working Test]
     
-    A1[Sequences] --> A
-    A2[Signals] --> A
-    A3[Architecture] --> A
+    subgraph Input
+        A1[Sequences]
+        A2[Signals]
+        A3[Architecture]
+    end
+    
+    A1 --> A
+    A2 --> A
+    A3 --> A
 ```
 
 ### 1.2 Component Dependencies
 
 ```python
 class TestIntegration:
-    def __init__(self, sequences, signals, architecture):
+    def __init__(self, sequences, signals, architecture, dcn_metadata):
         self.sequences = sequences
         self.signals = signals
         self.architecture = architecture
+        self.dcn_metadata = dcn_metadata # Contains info about the change
+        self.change_impact = self.analyze_change_impact()
+
+    def analyze_change_impact(self):
+        """Analyzes DCN to classify change as 'minor' or 'major'."""
+        if self.dcn_metadata.get('is_incremental_change', False):
+            return 'minor'
+        minor_keywords = ['update', 'modify', 'add constraint', 'tweak']
+        if any(kw in self.dcn_metadata.get('title', '').lower() for kw in minor_keywords):
+            return 'minor'
+        return 'major'
+
+    def integrate(self):
+        if self.change_impact == 'minor':
+            self.apply_minor_change()
+        else:
+            self.execute_full_integration()
+
+    def apply_minor_change(self):
+        """Finds and patches existing files for minor changes."""
+        target_sequence = self.dcn_metadata.get('target_sequence')
+        if target_sequence:
+            # Pseudocode for finding and patching a file
+            # file_path = find_sequence_file(target_sequence)
+            # patch_sequence(file_path, self.sequences)
+            print(f"Applying minor change to {target_sequence}")
+
+    def execute_full_integration(self):
+        """Executes the full, generative integration workflow."""
+        self.reference_components = self.find_reference_components()
         self.integration_map = self.create_integration_map()
+        # ... rest of the major change workflow
     
+    def find_reference_components(self):
+        """Search for existing verification files for reuse."""
+        search_keywords = [self.architecture.get('protocol'), *self.architecture.get('components', [])]
+        # Pseudocode for searching files. This would be implemented with file system tools.
+        # find_files(keywords=search_keywords, extensions=['.sv', '.svh', '*_pkg.sv'])
+        return "found_components"
+
     def create_integration_map(self):
         return {
             'interface_bindings': self.map_signals_to_interfaces(),
@@ -40,9 +91,84 @@ class TestIntegration:
         }
 ```
 
-## 2. Signal-to-Interface Mapping
+### 1.3 Reference Component Search
 
-### 2.1 Interface Generation
+Before generating new components from scratch, the agent must search the existing workspace for verification assets that can be reused or adapted. This step promotes code reuse and accelerates the verification process.
+
+**Search Strategy**:
+1.  **Identify Keywords**: Use keywords from the extracted components, such as protocol names (`AXI`, `PCIe`, `FIFO`), component types (`driver`, `monitor`, `agent`), and interface names.
+2.  **Filter by File Type**: Limit the search to verification-specific file extensions, such as `.sv`, `.svh`, `*_pkg.sv`, `*_test.sv`, and `Makefile` or script files related to simulation. Avoid searching within RTL directories (`rtl/`, `src/`).
+3.  **Analyze Findings**: If relevant files are found, the agent should analyze them to determine if they can be integrated directly or used as a template.
+
+```python
+def find_reusable_verification_files(keywords):
+    """
+    Searches the workspace for verification files matching a set of keywords.
+    The search is focused on non-RTL directories.
+    """
+    reusable_assets = {}
+    # Example: Search for files like 'axi_driver.sv', 'pcie_agent_pkg.sv', etc.
+    # This would be a call to a file search tool.
+    search_results = workspace.find_files(
+        query=f"**/*{keywords}*.sv*", 
+        exclude="**/rtl/**"
+    )
+    
+    for file_path in search_results:
+        component_type = detect_component_type(file_path) # e.g., 'driver', 'agent'
+        if component_type:
+            if component_type not in reusable_assets:
+                reusable_assets[component_type] = []
+            reusable_assets[component_type].append(file_path)
+            
+    return reusable_assets
+```
+
+## 2. Handling Minor Changes vs. Major Changes
+
+To optimize the workflow, the agent must first determine if a `VAL_DCN` represents a major change (requiring new component generation) or a minor change (which can be applied to existing components).
+
+### 2.1 Change Classification
+
+The agent can classify the change based on `VAL_DCN` metadata or keywords.
+
+-   **Minor Change**: Modifications to existing sequences, parameter adjustments, adding constraints, or checks in a scoreboard.
+    -   *Keywords*: "Modify sequence," "Adjust timing," "Add constraint," "Update test."
+-   **Major Change**: Introduction of a new protocol interface, a new UVM agent, or significant architectural changes.
+    -   *Keywords*: "New protocol," "Create agent," "Redesign scoreboard."
+
+### 2.2 Workflow for Minor Changes
+
+1.  **Identify Target Component**: The `VAL_DCN` should specify which existing component to modify (e.g., `feature_x_sequence` or `test_basic_write_read`).
+2.  **Locate File**: Use workspace search to find the component's source file (e.g., `feature_x_sequence.sv`).
+3.  **Analyze and Patch**:
+    -   The agent must read the existing file.
+    -   Identify the section to modify (e.g., a sequence's `task body()` or a `constraint`).
+    -   Apply the change surgically. For example, if the `VAL_DCN` asks to add a constraint, the agent should inject the new constraint into the sequence class without altering the rest of the file.
+
+```python
+def apply_sequence_patch(file_path, changes):
+    """
+    Applies a targeted modification to an existing sequence file.
+    'changes' is a dictionary describing the modification, 
+    e.g., {'type': 'add_constraint', 'body': 'addr < 1024;'}.
+    """
+    original_code = read_file(file_path)
+    
+    if changes['type'] == 'add_constraint':
+        # Use regex or AST parsing to find the right insertion point
+        new_code = insert_constraint(original_code, changes['body'])
+    elif changes['type'] == 'modify_task_body':
+        # Replace the body of a task
+        new_code = replace_task_body(original_code, changes['task_name'], changes['body'])
+    
+    write_file(file_path, new_code)
+    print(f"File {file_path} patched successfully.")
+```
+
+## 3. Signal-to-Interface Mapping
+
+### 3.1 Interface Generation
 
 **UVM Interface Template**:
 ```systemverilog
@@ -80,7 +206,7 @@ interface {interface_name}_if (input logic clk, input logic rst_n);
 endinterface
 ```
 
-### 2.2 Protocol-Agnostic Integration
+### 3.2 Protocol-Agnostic Integration
 
 #### Generic Protocol Integration
 ```python
@@ -129,9 +255,9 @@ def integrate_custom_signals(signals, sequences):
     return create_generic_integration(signals, sequences, generic_groups)
 ```
 
-## 3. Sequence Integration
+## 4. Sequence Integration
 
-### 3.1 Sequence Orchestration
+### 4.1 Sequence Orchestration
 
 **UVM Virtual Sequence Pattern**:
 ```systemverilog
@@ -168,7 +294,7 @@ class {test_name}_vseq extends uvm_sequence;
 endclass
 ```
 
-### 3.2 Sequence Synchronization
+### 4.2 Sequence Synchronization
 
 **Event-Based Synchronization**:
 ```systemverilog
@@ -214,9 +340,9 @@ class phased_sequence extends uvm_sequence;
 endclass
 ```
 
-## 4. Agent and Component Integration
+## 5. Agent and Component Integration
 
-### 4.1 Agent Configuration
+### 5.1 Agent Configuration
 
 ```systemverilog
 class {agent_name}_config extends uvm_object;
@@ -244,7 +370,7 @@ class {agent_name}_config extends uvm_object;
 endclass
 ```
 
-### 4.2 Environment Assembly
+### 5.2 Environment Assembly
 
 ```systemverilog
 class {test_name}_env extends uvm_env;
@@ -287,9 +413,9 @@ class {test_name}_env extends uvm_env;
 endclass
 ```
 
-## 5. Test Execution Flow
+## 6. Test Execution Flow
 
-### 5.1 Test Phase Management
+### 6.1 Test Phase Management
 
 ```systemverilog
 class {test_name}_test extends uvm_test;
@@ -324,7 +450,7 @@ class {test_name}_test extends uvm_test;
 endclass
 ```
 
-### 5.2 Timing and Synchronization
+### 6.2 Timing and Synchronization
 
 **Clock Domain Management**:
 ```systemverilog
@@ -366,9 +492,9 @@ virtual task reset_phase(uvm_phase phase);
 endtask
 ```
 
-## 6. Data Flow Integration
+## 7. Data Flow Integration
 
-### 6.1 Transaction Mapping
+### 7.1 Transaction Mapping
 
 ```systemverilog
 class {protocol}_transaction extends uvm_sequence_item;
@@ -392,7 +518,7 @@ class {protocol}_transaction extends uvm_sequence_item;
 endclass
 ```
 
-### 6.2 Stimulus Generation
+### 7.2 Stimulus Generation
 
 ```systemverilog
 class {protocol}_driver extends uvm_driver#({protocol}_transaction);
@@ -410,9 +536,9 @@ class {protocol}_driver extends uvm_driver#({protocol}_transaction);
 endclass
 ```
 
-## 7. Integration Validation
+## 8. Integration Validation
 
-### 7.1 Connectivity Checks
+### 8.1 Connectivity Checks
 
 ```python
 def validate_integration(test_components):
@@ -438,7 +564,7 @@ def check_connectivity(components):
     return errors
 ```
 
-### 7.2 Integration Testing
+### 8.2 Integration Testing
 
 ```systemverilog
 class integration_test extends uvm_test;
@@ -459,22 +585,22 @@ class integration_test extends uvm_test;
 endclass
 ```
 
-## 8. Methodology-Specific Integration
+## 9. Methodology-Specific Integration
 
-### 8.1 UVM-Specific Features
+### 9.1 UVM-Specific Features
 
 - **Factory Pattern**: Use UVM factory for component creation
 - **Configuration Database**: Centralized configuration management
 - **Analysis Ports**: For monitoring and coverage collection
 - **Objection Mechanism**: Phase control and synchronization
 
-### 8.2 OVM-Specific Features
+### 9.2 OVM-Specific Features
 
 - **Legacy Component Structure**: Adapt to OVM component hierarchy
 - **OVM Macros**: Use appropriate OVM utility macros
 - **Phase Methods**: Implement OVM phase methods
 
-### 8.3 Saola-Specific Features
+### 9.3 Saola-Specific Features
 
 - **BFM Integration**: Saola Bus Functional Models
 - **Test Manager**: Saola test execution framework
@@ -487,7 +613,8 @@ endclass
 3. **Error Handling**: Implement robust error checking
 4. **Documentation**: Maintain integration documentation
 5. **Validation**: Thoroughly test integrated components
-6. **Reusability**: Design for component reuse
+6. **Reusability**: Prioritize searching and reusing existing verification components before generating new ones.
+7. **Incremental Changes**: For minor updates, prefer modifying existing components over generating new ones to maintain stability and reduce overhead.
 
 ---
 
